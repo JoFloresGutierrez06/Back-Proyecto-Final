@@ -28,7 +28,7 @@ const app = express()
 const allowed = [
   'http://localhost:3000', // React
   'http://localhost:3001', // Backend
-  // 'https://frontend-full-stack-one.vercel.app', // Frontend en Vercel
+  'https://front-proyecto-final-blush.vercel.app', // Frontend en Vercel
 ];
 
 const limiter = rateLimit({
