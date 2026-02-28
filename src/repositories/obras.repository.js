@@ -18,7 +18,7 @@ class ObrasRepository {
 
     async getById(id) {         // Mostrar obra por id (Admin)
         const result = await pool.query(
-        'select id,titulo,autor,descripcion,portada,publicado from obras where id = $1;', [id]
+        'select id,titulo,autor,descripcion,portada,publicado,created_at from obras where id = $1;', [id]
         );
         return result.rows[0];
     }

@@ -1,5 +1,4 @@
 // Pruebas para que las validaciones se cumplan
-
 // Ejecutar 'npm test'
 
 const {validarObra} = require('./obras.rules')
