@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = process.env.JWT_SECRET || 'default_secret_key';
 
 function sign(obras) {
-    return jwt.sign(obras, SECRET, { expiresIn: '2y' }); // 10y
+    return jwt.sign(obras, SECRET, { expiresIn: '2h' }); // 10y
 }
 
 function authMiddleware(req, res, next) {
