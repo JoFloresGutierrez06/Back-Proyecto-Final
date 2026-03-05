@@ -23,6 +23,31 @@ class ObrasRepository {
         return result.rows[0];
     }
 
+    async getObrasPublicadasPaginadas(limit = 6, offset = 0) {  // Mostrar obras publicadas con paginación (Lector- admin)
+        const result = await pool.query(
+            'SELECT * FROM obras WHERE publicado = true ORDER BY id ASC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+        const total = await pool.query(
+            'SELECT count(*) FROM obras WHERE publicado = true ORDER BY id ASC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+        return { obras: result.rows, total: parseInt(total.rows[0].count) };
+    }
+    
+    async getObrasAllPaginadas(limit = 6, offset = 0) {     // Mostrar todas las obras con paginación (Autor - admin)
+        const result = await pool.query(
+            'SELECT * FROM obras ORDER BY id ASC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+
+        const total = await pool.query(
+            'SELECT count(*) as total FROM obras ORDER BY id ASC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+        return { obras: result.rows, total: parseInt(total.rows[0].total) };
+    }
+
     async create({titulo,autor,descripcion,portada}) {
         // Se le asigna un valor false por default a publicado al crear una obra
         const result = await pool.query(
@@ -46,6 +71,22 @@ class ObrasRepository {
         return result.rows[0] || null;      // con .rows[0] se devuelve únicamente un elemento json 
     }
 
+    async cambiarPublicado(id, publicado) {   // Cambia el estado de publicado a true o false dependiendo del valor que se le mande
+        const result = await pool.query(
+            'update obras set publicado = $1 where id = $2 returning publicado',[ publicado, id]   
+        );
+        return result.rows[0] || null;
+    }
+
+   /*  async despublicar(id) {   // Cambia el estado de publicado a false
+        const result = await pool.query(
+        'update obras set publicado = false where id = $1 returning id,titulo,autor,descripcion,portada,publicado', 
+        [id]                                // no se pone la variable directamente para evitar inyecciones SQL
+        );
+        return result.rows[0] || null;
+    }
+ */
+    
     async delete(id) {
 
         const result = await pool.query(
@@ -75,7 +116,7 @@ class ObrasRepository {
         // al principio por como lo tenía hecho no es que diera error, pero no arrojaba ninguna coincidencia aunque estuvieran bien los parámetros
         // lo que observa a continuación es un código que funciona, no sé si es lo mejor o no, pero es una mezcla de IA y desesperación que funciona, estoy muy feliz, ya puedo dormir
 
-    async buscar({ titulo, autor, limit = 10, offset = 0 }) { // Busca por autor o título entre todas las obras
+    async buscar({ titulo, autor, limit = 6, offset = 0 }) { // Busca por autor o título entre todas las obras
         const result = await pool.query(
             'select id, titulo, autor from obras where ($1::text is null or titulo ilike $1) and ($2::text is null or autor ilike $2) limit $3 offset $4',
             [titulo ? `%${titulo}%` : null, autor ? `%${autor}%` : null, limit, offset]

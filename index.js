@@ -58,18 +58,6 @@ app.get('/', (req, res) => { res.send('API OK'); })
 app.use('/obras', obrasRouter);
 app.use('/users', usersRouter);
 
-// app.post('/login', (req, res) => {
-//   const { user, password } = req.body;
-  
-//   if (user !== 'admin' || password !== '12345') {
-//     return res.status(401).json({ error: 'Credenciales incorrectas' })
-//   }
-
-//   const token = sign({ user, rol: 'admin' });
-
-//   return res.json({ token});
-// });
-
 app.get('/privado', authMiddleware, (req, res) => { // no fácilmente accesible, se necesita un token válido para acceder a esta ruta
   return res.json({ 
     ok: true, 

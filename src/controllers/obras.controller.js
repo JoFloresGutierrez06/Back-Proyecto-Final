@@ -3,18 +3,17 @@ const {validarObra} = require('../domain/obras.rules')
 
 const repo = new ObrasRepository();
 
+// GETS - MOSTRAR/OBTENER
 async function getAll(req, res) {   // Muestra todas las obras
 
     const obras = await repo.getAll()
     // console.log(obras)
     return res.json(obras)
 }
-
 async function getAllPublish(req, res) {    // Muestra todas las obras publicadas
     const obras = await repo.getAllPublish()
     return res.json(obras)
 }
-
 async function getById(req, res) {
 
     const id = Number(req.params.id)
@@ -25,7 +24,69 @@ async function getById(req, res) {
     }
     return res.json(obra)
 }
+// GETS PAGINADOS
+async function getObrasPublicadasPaginadas(req, res) {
+    try {
 
+        const {page = 1, limit = 6} = req.query;
+        page = Number(page);
+        limit = Number(limit);
+        const offset = (page - 1) * limit;
+
+        const resultados = await repo.getObrasPublicadasPaginadas(limit, offset);
+
+        if (!resultados.resultados || resultados.resultados.length === 0) {
+            return res.status(404).json({error: 'Ninguna obra encontrada'})
+        }
+
+        const total = resultados.total;
+        const obras = resultados.obras;
+        const totalPages = Math.ceil(total / limit);
+
+        return res.json({
+            page,
+            totalPages,
+            limit,
+            total: total,
+            data: obras
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error al obtener obras' });
+    }
+}
+async function getObrasAllPaginadas(req, res) {
+    try {
+
+        const {page = 1, limit = 6} = req.query;
+        page = Number(page);
+        limit = Number(limit);
+        const offset = (page - 1) * limit;
+
+        const resultados = await repo.getObrasAllPaginadas(limit, offset);
+
+        if (!resultados.resultados || resultados.resultados.length === 0) {
+            return res.status(404).json({error: 'Ninguna obra encontrada'})
+        }
+
+        const total = resultados.total;
+        const obras = resultados.obras;
+        const totalPages = Math.ceil(total / limit);
+
+        return res.json({
+            page,
+            totalPages,
+            limit,
+            total: total,
+            data: obras
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error al obtener obras' });
+    }
+}
+
+// CREAR OBRA
 async function create(req, res) {
     const portadaGenerica = 'https://img.freepik.com/vector-gratis/cubierta-libro-blanco-vector-aislado-blanco_1284-41904.jpg?semt=ais_hybrid&w=740&q=80'
     
@@ -48,6 +109,7 @@ async function create(req, res) {
     return res.status(201).json(nuevo)
 }
 
+// ACTUALIZAR OBRA
 async function update(req, res) {
 
     // Validar que mande algo el usuario
@@ -97,7 +159,25 @@ async function update(req, res) {
 
     return res.json(actualizado)
 }
+async function cambiarPublicado(req, res) {
 
+    const id = Number(req.params.id);
+    const publicado = req.body;
+    console.log(publicado)
+    const obra = await repo.getById(id);
+
+    if (!obra) return res.status(404).json({ error: 'No encontrado' });
+
+    const cambio = await repo.cambiarPublicado(id,  publicado.publicado);
+
+     if (!cambio) {
+        return res.status(404).json({error: 'No encontrado'})
+    }
+
+    return res.status(200).json(cambio);
+}
+
+// ELIMINAR OBRA
 async function remove(req, res) {
     const id = Number(req.params.id);
     const ok = await repo.delete(id)
@@ -109,6 +189,7 @@ async function remove(req, res) {
     return res.status(204).send()
 }
 
+// BUSCAR OBRA
 async function search(req,res) {  // Busca obras por titulo y autor (todas) con paginación
 
     const { titulo, autor, page = 1, limit = 5} = req.query; // limit 5 default para que no traiga tantos elementos
@@ -171,4 +252,4 @@ async function search(req,res) {  // Busca obras por titulo y autor (todas) con 
     });
 }
 
-module.exports = { getAll, getAllPublish, getById, create, update, remove, search }
+module.exports = { getAll, getAllPublish, getById, getObrasPublicadasPaginadas, getObrasAllPaginadas, create, update, remove, search }
