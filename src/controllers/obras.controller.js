@@ -58,14 +58,15 @@ async function getObrasPublicadasPaginadas(req, res) {
 async function getObrasAllPaginadas(req, res) {
     try {
 
-        const {page = 1, limit = 6} = req.query;
+        let {page = 1, limit = 6} = req.query;
         page = Number(page);
         limit = Number(limit);
         const offset = (page - 1) * limit;
 
         const resultados = await repo.getObrasAllPaginadas(limit, offset);
 
-        if (!resultados.resultados || resultados.resultados.length === 0) {
+        console.log("Resultados =", resultados)
+        if (!resultados.obras || resultados.obras.length === 0) {
             return res.status(404).json({error: 'Ninguna obra encontrada'})
         }
 

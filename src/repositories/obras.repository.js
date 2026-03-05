@@ -36,16 +36,17 @@ class ObrasRepository {
     }
     
     async getObrasAllPaginadas(limit = 6, offset = 0) {     // Mostrar todas las obras con paginación (Autor - admin)
+
         const result = await pool.query(
             'SELECT * FROM obras ORDER BY id ASC LIMIT $1 OFFSET $2',
             [limit, offset]
         );
 
-        const total = await pool.query(
-            'SELECT count(*) as total FROM obras ORDER BY id ASC LIMIT $1 OFFSET $2',
-            [limit, offset]
-        );
-        return { obras: result.rows, total: parseInt(total.rows[0].total) };
+        const total = await pool.query( 'SELECT count(*) as total FROM obras');
+
+        return { 
+            obras: result.rows, 
+            total: parseInt(total.rows[0].total) };
     }
 
     async create({titulo,autor,descripcion,portada}) {

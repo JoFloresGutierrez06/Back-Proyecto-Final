@@ -7,8 +7,8 @@ const router = express.Router()
 
 router.get("/", asyncHandler(controller.getAllPublish))     // Mostrar obras publicadas 
 // router.get("/", asyncHandler(controller.getObrasPublicadasPaginadas))     // Mostrar obras publicadas 
-// router.get("/all", authMiddleware, requireRole('admin', 'autor'),asyncHandler(controller.getAll))                    // todo esto se almacena en la variable router
 router.get("/all", authMiddleware, requireRole('admin', 'autor'),asyncHandler(controller.getObrasAllPaginadas))         // todo esto se almacena en la variable router
+// router.get("/all", authMiddleware, requireRole('admin', 'autor'),asyncHandler(controller.getAll))                    // todo esto se almacena en la variable router
 router.get("/search", asyncHandler(controller.search))      // /search?titulo=caperucita+roja&autor=laura+quezada  
 router.get("/:id", asyncHandler(controller.getById))        // Buscar obra por id
 
